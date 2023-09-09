@@ -136,7 +136,8 @@ class OobaApiClient:
         self._generate_url = f"{self.url}/api/v1/generate"
         self.api_key = api_key
 
-        assert not self.api_key, "API keys are not yet supported"
+        if self.api_key:
+            logger.warning("API keys are not yet supported")
 
     def instruct(
         self,
