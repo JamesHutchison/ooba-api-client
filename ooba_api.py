@@ -10,36 +10,55 @@ prompt_logger = logging.getLogger("ooba_api.prompt")
 
 
 class Parameters(pydantic.BaseModel):
-    add_bos_token: bool = True  # add beginning token, highly recommended
-    auto_max_new_tokens: bool = (  # ignore max_new_tokens and instead max out the context length
-        False
-    )
-    ban_eos_token: bool = False  # do not allow the model to end
-    guidance_scale: pydantic.conint(  # knob, how much it will listen to you
-        ge=0, le=2.5
-    ) = 1
-    max_new_tokens: pydantic.conint(gt=1) = 128  # limit output tokens
-    min_length: pydantic.conint(gt=0) = 0  # force generation of a minimum length
-    repetition_penalty_range: pydantic.conint(gt=0) = 1  # TODO: what does this do?
-    repetition_penalty: pydantic.confloat(  # knob, penalize repeating tokens. Recommended
-        gt=0
-    ) = 1.1
-    seed: int = -1  # knob, random seed, use -1 for a random... random seed
-    skip_special_tokens: bool = (  # do not include special tokens. Some models have to disable this
-        True
-    )
-    stopping_strings: pydantic.conlist(  # tell model to stop if it spits out one of these strings
-        str, min_items=0
-    ) = []
-    temperature: pydantic.confloat(  # knob, with sample, random selection. High is more random or creative
-        gt=0, lt=1.0
-    ) = 0.6
-    top_k: pydantic.conint(gt=0) = 20  # knob, number of samples
-    top_p: pydantic.confloat(  # knob, probability threshold for considering a sample
-        gt=0, lt=1
-    ) = 0.9
-    typical_p: pydantic.conint(gt=0) = 1  # TODO: what does this do?
-    truncation_length: pydantic.conint(gt=1) = 4096  # length to truncate the prompt
+    # add beginning token, highly recommended
+    add_bos_token: bool = True  
+    
+    # ignore max_new_tokens and instead max out the context length
+    auto_max_new_tokens: bool = False
+    
+    # do not allow the model to end
+    ban_eos_token: bool = False  
+    
+    # knob, how much it will listen to you
+    guidance_scale: pydantic.conint(ge=0, le=2.5) = 1
+    
+    # limit output tokens
+    max_new_tokens: pydantic.conint(gt=1) = 128  
+    
+    # force generation of a minimum length
+    min_length: pydantic.conint(gt=0) = 0  
+    
+    # TODO: what does this do?
+    repetition_penalty_range: pydantic.conint(gt=0) = 1  
+    
+    # knob, penalize repeating tokens. Recommended
+    repetition_penalty: pydantic.confloat(gt=0) = 1.1
+    
+    # knob, random seed, use -1 for a random... random seed
+    seed: int = -1  
+    
+    # do not include special tokens. Some models have to disable this
+    skip_special_tokens: bool = True  
+    
+    # tell model to stop if it spits out one of these strings
+    stopping_strings: pydantic.conlist(str, min_items=0) = []  
+    
+    # knob, with sample, random selection. High is more random or creative
+    temperature: pydantic.confloat(gt=0, lt=1.0) = 0.6  
+    
+    # knob, number of samples. 
+    top_k: pydantic.conint(gt=0) = 20  
+    
+    # knob, probability threshold for considering a sample
+    top_p: pydantic.confloat(gt=0, lt=1) = 0.5  
+    
+    # knob, a value of 1 disables it. Tokens too far from this are removed.
+    # Typically used if a high temperature starts producing gibberish.
+    typical_p: pydantic.conint(gt=0, lt=1) = 1
+    
+    # length to truncate the prompt. Should always be lower than the max context size
+    truncation_length: pydantic.conint(gt=1) = 4096  
+
 
 
 DEFAULT_PARAMETERS = Parameters()
