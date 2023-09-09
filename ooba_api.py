@@ -10,13 +10,13 @@ prompt_logger = logging.getLogger("ooba_api.prompt")
 
 
 class Parameters(pydantic.BaseModel):
-    # add beginning token, highly recommended
+    # add beginning token, highly recommended but maybe some models don't want this
     add_bos_token: bool = True
     
-    # ignore max_new_tokens and instead max out the context length
+    # ignore max_new_tokens and instead use math to set max tokens and max out the context length
     auto_max_new_tokens: bool = False
     
-    # do not allow the model to end
+    # disables the "end of sentence" token. Probably would only enable this if combined with custom stopping strings.
     ban_eos_token: bool = False
     
     # knob, how much it will listen to you
