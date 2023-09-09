@@ -142,7 +142,7 @@ class OobaApiClient:
         self,
         prompt: Prompt,
         parameters: Parameters = DEFAULT_PARAMETERS,
-        timeout: int = 500,
+        timeout: int | float = 500,
         print_prompt: bool = False,
     ) -> str:
         """
