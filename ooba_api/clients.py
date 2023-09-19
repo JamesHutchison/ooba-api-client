@@ -65,6 +65,8 @@ class OobaApiClient:
         if print_prompt:
             print(prompt_to_use)
         prompt_logger.info(prompt_to_use)
+
+        # pydantic compatibility. dict -> model_dump
         if hasattr(parameters, "model_dump"):
             param_dict = parameters.model_dump()
         else:
