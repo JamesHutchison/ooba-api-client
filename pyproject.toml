@@ -7,11 +7,12 @@ line-length = 120
 line-length = 98
 
 [tool.poetry]
-name = "ooba_api"
+name = "ooba-api-client"
 version = "0.1.0-alpha.1"
 description = "API Client for Ooba Booga's Text Generation WebUI"
 authors = ["James Hutchison <jamesghutchison@proton.me>"]
 readme = "README.md"
+packages = [{ include = "ooba_api" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
