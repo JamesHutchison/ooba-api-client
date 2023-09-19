@@ -2,6 +2,7 @@ import json
 import logging
 
 import requests
+from requests import Response
 
 from ooba_api.parameters import DEFAULT_PARAMETERS, Parameters
 from ooba_api.prompts import Prompt
@@ -14,6 +15,15 @@ class OobaApiClient:
     """
     Client for the Ooba Booga text generation web UI
     """
+
+    # full URL to chat endpoint
+    _chat_url: str
+
+    # full URL to generate endpoint
+    _generate_url: str
+
+    # API Key, not yet used
+    api_key: str | None
 
     def __init__(
         self,
@@ -34,6 +44,9 @@ class OobaApiClient:
         if self.api_key:
             logger.warning("API keys are not yet supported")
 
+    def _post(self, target_url: str, timeout: float, data: dict) -> requests.Response:
+        return requests.post(target_url, timeout=timeout, json=data)
+
     def instruct(
         self,
         prompt: Prompt,
@@ -53,10 +66,10 @@ class OobaApiClient:
         if print_prompt:
             print(prompt_to_use)
         prompt_logger.info(prompt_to_use)
-        response = requests.post(
+        response = self._post(
             self._generate_url,
             timeout=timeout,
-            json=prompt.model_dump() | parameters.model_dump(),
+            data=prompt.model_dump() | parameters.model_dump(),
         )
         response.raise_for_status()
         data = response.json()
