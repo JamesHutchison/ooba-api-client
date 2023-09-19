@@ -65,12 +65,17 @@ class OobaApiClient:
         if print_prompt:
             print(prompt_to_use)
         prompt_logger.info(prompt_to_use)
+        if hasattr(parameters, "model_dump"):
+            param_dict = parameters.model_dump()
+        else:
+            param_dict = parameters.dict()
+
         response = self._post(
             self._generate_url,
             timeout=timeout,
             data=(
                 {"prompt": prompt_to_use, "negative_prompt": prompt.negative_prompt or ""}
-                | parameters.model_dump()
+                | param_dict
             ),
         )
         response.raise_for_status()

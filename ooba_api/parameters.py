@@ -1,3 +1,4 @@
+from distutils.version import LooseVersion
 from typing import TYPE_CHECKING
 
 import pydantic
@@ -8,7 +9,10 @@ if not TYPE_CHECKING:
     MinLength = pydantic.conint(gt=0)
     RepetitionPenaltyRange = pydantic.conint(gt=0)
     RepetitionPenalty = pydantic.confloat(gt=0)
-    StoppingStrings = pydantic.conlist(str, min_length=0)
+    if LooseVersion(pydantic.__version__).version[0] < 2:
+        StoppingStrings = pydantic.conlist(str, min_items=0)
+    else:
+        StoppingStrings = pydantic.conlist(str, min_length=0)
     Temperature = pydantic.confloat(gt=0, lt=1.0)
     TopK = pydantic.conint(gt=0)
     TopP = pydantic.confloat(gt=0, lt=1)

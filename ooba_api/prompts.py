@@ -1,4 +1,5 @@
 import textwrap
+from distutils.version import LooseVersion
 from typing import TYPE_CHECKING
 
 import pydantic
@@ -24,7 +25,10 @@ class InstructPrompt(Prompt):
 
 
 if not TYPE_CHECKING:
-    Messages = pydantic.conlist(dict, min_length=1)
+    if LooseVersion(pydantic.__version__).version[0] < 2:
+        Messages = pydantic.conlist(dict, min_items=1)
+    else:
+        Messages = pydantic.conlist(dict, min_length=1)
 else:
     Messages = list
 
