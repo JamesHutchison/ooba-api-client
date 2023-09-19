@@ -36,7 +36,7 @@ response = client.instruct(
     ),
     parameters=Parameters(temperature=0.2, repetition_penalty=0.7),
 )
-print(response)  #
+print(response)
 ```
 
 ~~~
