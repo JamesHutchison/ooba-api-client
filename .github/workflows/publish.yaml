@@ -29,7 +29,7 @@ jobs:
     - name: poetry install
       run: poetry install --with=dev
     - name: test
-      run: poetry run pytest
+      run: PYTHONPATH=. poetry run pytest
     - name: Build distributions
       run: |
         poetry build
