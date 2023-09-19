@@ -2,7 +2,6 @@ import json
 import logging
 
 import requests
-from requests import Response
 
 from ooba_api.parameters import DEFAULT_PARAMETERS, Parameters
 from ooba_api.prompts import Prompt
