@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 
 import pydantic
 
+from ooba_api.pydantic_compat import USING_PYDANTIC_LEGACY
+
 
 class Prompt(pydantic.BaseModel):
     negative_prompt: str | None = None
@@ -24,7 +26,10 @@ class InstructPrompt(Prompt):
 
 
 if not TYPE_CHECKING:
-    Messages = pydantic.conlist(dict, min_length=1)
+    if USING_PYDANTIC_LEGACY:
+        Messages = pydantic.conlist(dict, min_items=1)
+    else:
+        Messages = pydantic.conlist(dict, min_length=1)
 else:
     Messages = list
 

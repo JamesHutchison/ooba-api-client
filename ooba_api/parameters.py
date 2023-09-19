@@ -2,13 +2,18 @@ from typing import TYPE_CHECKING
 
 import pydantic
 
+from ooba_api.pydantic_compat import USING_PYDANTIC_LEGACY
+
 if not TYPE_CHECKING:
     GuidanceScale = pydantic.confloat(ge=0, le=2.5)
     NewMaxTokens = pydantic.conint(gt=1)
     MinLength = pydantic.conint(gt=0)
     RepetitionPenaltyRange = pydantic.conint(gt=0)
     RepetitionPenalty = pydantic.confloat(gt=0)
-    StoppingStrings = pydantic.conlist(str, min_length=0)
+    if USING_PYDANTIC_LEGACY:
+        StoppingStrings = pydantic.conlist(str, min_items=0)
+    else:
+        StoppingStrings = pydantic.conlist(str, min_length=0)
     Temperature = pydantic.confloat(gt=0, lt=1.0)
     TopK = pydantic.conint(gt=0)
     TopP = pydantic.confloat(gt=0, lt=1)
