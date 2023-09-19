@@ -5,11 +5,11 @@ An API client for the text generation UI, with sane defaults.
 Motivation: documentation isn't great, examples are gnarly, not seeing an existing library.
 
 Supported use cases:
-- generate / instruct - [ x ]
-- chat - [ ]
-- streaming instruct - [ ]
-- streaming chat - [ ]
-- model info - [ ]
+- [x] generate / instruct
+- [ ] chat
+- [ ] streaming instruct
+- [ ] streaming chat
+- [ ] model info
 
 Example:
 ```python
