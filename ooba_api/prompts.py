@@ -1,8 +1,9 @@
 import textwrap
-from distutils.version import LooseVersion
 from typing import TYPE_CHECKING
 
 import pydantic
+
+from ooba_api.pydantic_compat import USING_PYDANTIC_LEGACY
 
 
 class Prompt(pydantic.BaseModel):
@@ -25,7 +26,7 @@ class InstructPrompt(Prompt):
 
 
 if not TYPE_CHECKING:
-    if LooseVersion(pydantic.__version__).version[0] < 2:
+    if USING_PYDANTIC_LEGACY:
         Messages = pydantic.conlist(dict, min_items=1)
     else:
         Messages = pydantic.conlist(dict, min_length=1)

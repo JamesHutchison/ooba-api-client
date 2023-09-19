@@ -1,7 +1,8 @@
-from distutils.version import LooseVersion
 from typing import TYPE_CHECKING
 
 import pydantic
+
+from ooba_api.pydantic_compat import USING_PYDANTIC_LEGACY
 
 if not TYPE_CHECKING:
     GuidanceScale = pydantic.confloat(ge=0, le=2.5)
@@ -9,7 +10,7 @@ if not TYPE_CHECKING:
     MinLength = pydantic.conint(gt=0)
     RepetitionPenaltyRange = pydantic.conint(gt=0)
     RepetitionPenalty = pydantic.confloat(gt=0)
-    if LooseVersion(pydantic.__version__).version[0] < 2:
+    if USING_PYDANTIC_LEGACY:
         StoppingStrings = pydantic.conlist(str, min_items=0)
     else:
         StoppingStrings = pydantic.conlist(str, min_length=0)
