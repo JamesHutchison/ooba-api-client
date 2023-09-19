@@ -30,7 +30,7 @@ jobs:
         poetry install --no-interaction
     - name: Lint with ruff
       run: |
-        poetry run ruff ptyme_track tests
+        poetry run ruff ooba_api tests
     - name: Lint with mypy
       run: |
         poetry run mypy .
