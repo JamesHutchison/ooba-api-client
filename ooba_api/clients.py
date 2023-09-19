@@ -69,7 +69,10 @@ class OobaApiClient:
         response = self._post(
             self._generate_url,
             timeout=timeout,
-            data=prompt.model_dump() | parameters.model_dump(),
+            data=(
+                {"prompt": prompt_to_use, "negative_prompt": prompt.negative_prompt or ""}
+                | parameters.model_dump()
+            ),
         )
         response.raise_for_status()
         data = response.json()
