@@ -11,6 +11,10 @@ Supported use cases:
 - [ ] streaming chat
 - [ ] model info
 
+## Installation
+
+`pip install ooba-api-client`
+
 ## What model should I use?
 If you're new to LLMs, you may be unsure what model to use for your use case.
 
