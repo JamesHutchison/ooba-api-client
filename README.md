@@ -99,3 +99,14 @@ response = client.instruct(
     parameters=Parameters(temperature=0.2, repetition_penalty=1.05),
 )
 ```
+
+### Running Ooba-Booga
+The Text Generation Web UI can be found here:
+
+https://github.com/oobabooga/text-generation-webui/
+
+This start-up config gives very good performance on a RTX 3060-TI with 8 GB of VRAM on an i5 system with 32 GB of DDR4. In many cases this produced over 20 tokens / sec. There is no delay before producing tokens.
+
+`python server.py --model codellama-7b-instruct.Q4_K_M.gguf --api --listen --gpu-memory 8 --cpu-memory 1 --n-gpu-layers 1000000 --loader ctransformer --n_ctx 2500`
+
+Increasing the context size (2500) will slow it down.
