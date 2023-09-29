@@ -19,6 +19,7 @@ python = "^3.10"
 pydantic = "*"
 requests = "*"
 types-requests = "*"
+transformers = "^4.33.3"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.5.1"
