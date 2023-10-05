@@ -6,6 +6,7 @@ import requests
 from megamock import Mega, MegaMock
 
 from ooba_api.clients import OobaApiClient
+from ooba_api.model_info import OobaModelInfo, OobaModelNotLoaded
 from ooba_api.prompts import InstructPrompt
 
 
@@ -85,3 +86,65 @@ class TestOobaApiClient:
             assert records[0].msg == "a prompt"
             assert records[1].name == "ooba_api"
             assert records[1].msg == json.dumps(generate_output, indent=2)
+
+    class TestModelInfo:
+        @pytest.fixture(autouse=True)
+        def setup(self) -> None:
+            self.client = MegaMock.it(OobaApiClient)
+            Mega(self.client.model_info).use_real_logic()
+            Mega(self.client._model_api).use_real_logic()
+            self.client._model_url = "http://host/api/v1/model"
+
+        def test_when_not_loaded(self, model_not_loaded_output: dict) -> None:
+            response = MegaMock.it(requests.Response)
+            response.json.return_value = model_not_loaded_output
+            self.client._post.return_value = response
+
+            result: OobaModelNotLoaded = self.client.model_info()
+
+            assert isinstance(result, OobaModelNotLoaded)
+            assert result.shared_args
+            assert result.shared_settings
+
+        def test_when_loaded(self, model_loaded_output: dict) -> None:
+            response = MegaMock.it(requests.Response)
+            response.json.return_value = model_loaded_output
+            self.client._post.return_value = response
+
+            result: OobaModelInfo = self.client.model_info()
+
+            assert result.model_name == "codellama-7b-instruct.Q4_K_M.gguf"
+            # lora, at least creating one, is broken at the time of this writing
+            assert result.lora_names == ["todo-actual-value"]
+            assert result.shared_args
+            assert result.shared_settings
+
+    class TestLoadModel:
+        @pytest.fixture(autouse=True)
+        def setup(self) -> None:
+            self.client = MegaMock.it(OobaApiClient)
+            Mega(self.client.load_model).use_real_logic()
+            Mega(self.client._model_api).use_real_logic()
+            self.client._model_url = "http://host/api/v1/model"
+
+        def test_load_model(self, load_model_output) -> None:
+            response = MegaMock.it(requests.Response)
+            response.json.return_value = load_model_output
+            self.client._post.return_value = response
+
+            result: OobaModelInfo = self.client.load_model(
+                "codellama-7b-instruct.Q4_K_M.gguf",
+                args_dict={
+                    "loader": "ctransformers",
+                    "n-gpu-layers": 100,
+                    "n_ctx": 2500,
+                    "threads": 0,
+                    "n_batch": 512,
+                    "model_type": "llama",
+                },
+            )
+
+            assert result.model_name == "codellama-7b-instruct.Q4_K_M.gguf"
+            assert result.lora_names == []
+            assert result.shared_args
+            assert result.shared_settings
