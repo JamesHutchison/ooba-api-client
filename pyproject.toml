@@ -8,7 +8,7 @@ line-length = 98
 
 [tool.poetry]
 name = "ooba-api-client"
-version = "0.1.0-alpha.3"
+version = "0.1.0-alpha.4"
 description = "API Client for Ooba Booga's Text Generation WebUI"
 authors = ["James Hutchison <jamesghutchison@proton.me>"]
 readme = "README.md"

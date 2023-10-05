@@ -1,13 +1,18 @@
 import json
 import logging
+from multiprocessing import Lock
 
 import requests
 
+from ooba_api.model_info import OobaModelInfo, OobaModelNotLoaded
 from ooba_api.parameters import DEFAULT_PARAMETERS, Parameters
 from ooba_api.prompts import Prompt
 
 logger = logging.getLogger("ooba_api")
 prompt_logger = logging.getLogger("ooba_api.prompt")
+
+# global lock
+_one_at_a_time_lock = Lock()
 
 
 class OobaApiClient:
@@ -21,8 +26,14 @@ class OobaApiClient:
     # full URL to generate endpoint
     _generate_url: str
 
+    # full URL to model endpoint
+    _model_url: str
+
     # API Key, not yet used
     api_key: str | None
+
+    # Enforce one request at a time to avoid overwhelming the server
+    one_at_a_time: bool
 
     def __init__(
         self,
@@ -31,6 +42,7 @@ class OobaApiClient:
         host: str = "http://localhost",
         port: int = 5000,
         api_key: str | None = None,
+        one_at_a_time: bool = True,
     ):
         if url:
             self.url = url
@@ -38,13 +50,16 @@ class OobaApiClient:
             self.url = f"{host}:{port}"
         self._chat_url = f"{self.url}/api/v1/chat"
         self._generate_url = f"{self.url}/api/v1/generate"
+        self._model_url = f"{self.url}/api/v1/model"
         self.api_key = api_key
+        self.one_at_a_time = one_at_a_time
 
         if self.api_key:
             logger.warning("API keys are not yet supported")
 
     def _post(self, target_url: str, timeout: float, data: dict) -> requests.Response:
-        return requests.post(target_url, timeout=timeout, json=data)
+        with _one_at_a_time_lock:
+            return requests.post(target_url, timeout=timeout, json=data)
 
     def instruct(
         self,
@@ -86,3 +101,35 @@ class OobaApiClient:
             logger.debug(json.dumps(data, indent=2))
 
         return data["results"][0]["text"]
+
+    def _model_api(self, request: dict, timeout: int | float = 500) -> dict:
+        response = self._post(self._model_url, timeout, request)
+        response.raise_for_status()
+        data = response.json()
+        if __debug__:
+            logger.debug(json.dumps(data, indent=2))
+
+        return data["result"]
+
+    def model_info(self) -> OobaModelInfo:
+        result = self._model_api({"action": "info"}, timeout=5)
+        model_name = result["model_name"]
+        if model_name == "None":
+            return OobaModelNotLoaded(
+                shared_settings=result["shared.settings"], shared_args=result["shared.args"]
+            )
+        return OobaModelInfo(
+            model_name=result["model_name"],
+            lora_names=result["lora_names"],
+            shared_settings=result["shared.settings"],
+            shared_args=result["shared.args"],
+        )
+
+    def load_model(self, model_name: str, *, args_dict: dict) -> OobaModelInfo:
+        result = self._model_api({"action": "load", "model_name": model_name, "args": args_dict}, timeout=5000)
+        return OobaModelInfo(
+            model_name=result["model_name"],
+            lora_names=result["lora_names"],
+            shared_settings=result["shared.settings"],
+            shared_args=result["shared.args"],
+        )
