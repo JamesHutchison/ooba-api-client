@@ -9,7 +9,8 @@ Supported use cases:
 - [ ] chat
 - [ ] streaming instruct
 - [ ] streaming chat
-- [ ] model info
+- [x] model info
+- [x] model loading
 
 ## Installation
 
@@ -33,9 +34,7 @@ The instruct models are tuned towards following instructions. If your interest i
 ```python
 import logging
 
-from ooba_api.clients import OobaApiClient
-from ooba_api.parameters import Parameters
-from ooba_api.prompts import LlamaInstructPrompt
+from ooba_api import OobaApiClient, Parameters, LlamaInstructPrompt
 
 logger = logging.getLogger("ooba_api")
 logger.setLevel(logging.DEBUG)
@@ -65,6 +64,36 @@ def reverse_file(file_path):
     return content[::-1]
 ```
 ~~~
+
+## Model Information and Loading
+To get the currently loaded model:
+
+```python
+from ooba_api import OobaApiClient, OobaModelInfo, OobaModelNotLoaded
+
+model_info: OobaModelInfo = client.model_info()
+
+print(model_info)
+
+# model_info will be OobaModelNotLoaded if no model is currently loaded
+assert not isinstance(model_info, OobaModelNotLoaded)
+```
+
+To load a model:
+
+```python
+load_model_response: OobaModelInfo = client.load_model(
+    "codellama-7b-instruct.Q4_K_M.gguf",
+    args_dict={
+        "loader": "ctransformers",
+        "n-gpu-layers": 100,
+        "n_ctx": 2500,
+        "threads": 0,
+        "n_batch": 512,
+        "model_type": "llama",
+    },
+)
+```
 
 ## Appendix
 
