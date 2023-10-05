@@ -3,6 +3,7 @@ import logging
 
 import requests
 
+from ooba_api.model_info import ModelInfo
 from ooba_api.parameters import DEFAULT_PARAMETERS, Parameters
 from ooba_api.prompts import Prompt
 
@@ -38,6 +39,7 @@ class OobaApiClient:
             self.url = f"{host}:{port}"
         self._chat_url = f"{self.url}/api/v1/chat"
         self._generate_url = f"{self.url}/api/v1/generate"
+        self._model_url = f"{self.url}/api/v1/model"
         self.api_key = api_key
 
         if self.api_key:
@@ -86,3 +88,15 @@ class OobaApiClient:
             logger.debug(json.dumps(data, indent=2))
 
         return data["results"][0]["text"]
+
+    def _model_api(self, request: dict, timeout: int | float = 500) -> dict:
+        response = self._post(self._model_url, timeout, request)
+        return response.json()
+
+    def model_info(self) -> ModelInfo:
+        response = self._model_api({"action": "info"})
+        result = response["result"]
+        return ModelInfo(model_name=result["model_name"], lora_names=result["lora_names"])
+
+    def load_model(self, model_name: str) -> dict:
+        return self._model_api({"action": "load", "model_name": model_name})
